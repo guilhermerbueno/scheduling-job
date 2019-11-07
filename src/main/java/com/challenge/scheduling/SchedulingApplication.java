@@ -1,6 +1,7 @@
 package com.challenge.scheduling;
 
 import com.challenge.scheduling.model.Job;
+import com.challenge.scheduling.model.Scheduling;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -18,7 +19,38 @@ public class SchedulingApplication {
 	}
 
 	private static void generateScheduling(List<Job> jobs){
+		Scheduling scheduling = new Scheduling();
+		List<Job> jobsDay = new ArrayList<>();
+		while(!jobs.isEmpty()){
 
+			Job job = findLowerFinishJob(jobs);
+			boolean fitsCurrentDay = checkDailyCapacity(jobsDay, job);
+			if(fitsCurrentDay){
+
+			} else {
+
+			}
+		}
+	}
+
+	/**
+	 * Find the first task that should be finished
+	 *
+	 * @param jobs
+	 * @return the job with the lowest finished date
+	 */
+	private static Job findLowerFinishJob(List<Job> jobs){
+		return null;
+	}
+
+	/**
+	 * Check if the job could be do at the current day or should be postponed to the next day
+	 *
+	 * @param job
+	 * @return <b>True</b> if could be done at the current day or <b>False</b> if should be postponed
+	 */
+	private static	boolean checkDailyCapacity(List<Job> jobs, Job job){
+		return true;
 	}
 
 	private static List<Job> createJobs(){
