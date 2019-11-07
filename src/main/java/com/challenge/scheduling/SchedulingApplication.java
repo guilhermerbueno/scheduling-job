@@ -40,7 +40,20 @@ public class SchedulingApplication {
 	 * @return the job with the lowest finished date
 	 */
 	private static Job findLowerFinishJob(List<Job> jobs){
-		return null;
+		Job lowerFinishJob = jobs.get(0);
+		for (int i = 1; i < jobs.size(); i++){
+			if(jobs.get(i).getLimitDate().isBefore(lowerFinishJob.getLimitDate())){
+				lowerFinishJob = jobs.get(i);
+			}
+
+			if(jobs.get(i).getLimitDate().isEqual(lowerFinishJob.getLimitDate())){
+				if(jobs.get(i).getEstimatedDuration() < lowerFinishJob.getEstimatedDuration()){
+					lowerFinishJob = jobs.get(i);
+				}
+			}
+		}
+
+		return lowerFinishJob;
 	}
 
 	/**
