@@ -1,18 +1,30 @@
 package com.challenge.scheduling.model;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name="Job")
 public class Job {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @NotNull
+    @Column(name = "description")
     private String description;
 
+    @NotNull
+    @Column(name = "limit_date")
     private LocalDateTime limitDate;
 
     /**
      * The estimated duration of job execution in hours
      */
+    @NotNull
+    @Column(name = "duration")
     private int estimatedDuration;
 
     public Job(long id, String description, LocalDateTime limitDate, int estimatedDuration) {
