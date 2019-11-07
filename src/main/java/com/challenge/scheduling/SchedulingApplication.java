@@ -17,6 +17,8 @@ public class SchedulingApplication {
 		SpringApplication.run(SchedulingApplication.class, args);
 		List<Job> jobs = createJobs();
 		Scheduling scheduling = generateScheduling(jobs);
+
+		scheduling.print();
 	}
 
 	private static Scheduling generateScheduling(List<Job> allJobsToSchedule){
@@ -27,10 +29,10 @@ public class SchedulingApplication {
 			Job job = findLowerFinishJob(allJobsToSchedule);
 
 			int duration = calculateJobsDuration(jobsDay, job);
-			if(duration <= scheduling.getDailyCapacity()){
+			if(scheduling.checkDailyCapacity(duration)){
 				jobsDay.add(job);
 			} else {
-				scheduling.getJobScheduling().add(new ArrayList<Job>(jobsDay));
+				scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
 				jobsDay.clear();
 				jobsDay.add(job);
 			}
@@ -38,7 +40,7 @@ public class SchedulingApplication {
 			allJobsToSchedule.remove(job);
 		}
 
-		scheduling.getJobScheduling().add(new ArrayList<Job>(jobsDay));
+		scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
 
 		return scheduling;
 	}
