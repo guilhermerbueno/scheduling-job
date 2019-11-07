@@ -1,6 +1,6 @@
 package com.challenge.scheduling.model;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 
 public class Job {
 
@@ -8,14 +8,15 @@ public class Job {
 
     private String description;
 
-    private Calendar limitDate;
+    private LocalDateTime limitDate;
 
     /**
      * The estimated duration of job execution in hours
      */
     private int estimatedDuration;
 
-    public Job(String description, Calendar limitDate, int estimatedDuration) {
+    public Job(long id, String description, LocalDateTime limitDate, int estimatedDuration) {
+        this.id = id;
         this.description = description;
         this.limitDate = limitDate;
         this.estimatedDuration = estimatedDuration;
@@ -37,11 +38,11 @@ public class Job {
         this.description = description;
     }
 
-    public Calendar getLimitDate() {
+    public LocalDateTime getLimitDate() {
         return limitDate;
     }
 
-    public void setLimitDate(Calendar limitDate) {
+    public void setLimitDate(LocalDateTime limitDate) {
         this.limitDate = limitDate;
     }
 
