@@ -21,41 +21,55 @@ public class SchedulingServiceImpl implements SchedulingService {
     @Override
     public Scheduling generateScheduling(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         List<Job> allJobsToSchedule = jobService.getAllJobs();
-        long avaialableHours = ChronoUnit.HOURS.between(startDate, endDate);
-        validateJobs(allJobsToSchedule, startDate, endDate);
-        return runScheduling(allJobsToSchedule, avaialableHours);
+
+        return runScheduling(allJobsToSchedule, startDate, endDate);
     }
 
-    private void validateJobs(List<Job> jobs, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
-        for(Job job : jobs){
-            if(job.getLimitDate().isBefore(startDate)){
-                throw new Exception("Job " + job.getId() + " is out of required period");
-            }
+    private LocalDateTime validateJob(Job job, LocalDateTime currentDate, LocalDateTime endDate) throws Exception {
+        currentDate = currentDate.plusHours(job.getEstimatedDuration());
+        if(job.getLimitDate().isBefore(currentDate)){
+            throw new Exception("The job " + job.getId() + " is out of required period");
+        }
+        if(currentDate.isAfter(endDate)){
+            throw new Exception("The job "+ job.getId() + " couldn't be finish before the limit date");
+        }
+
+        return currentDate;
+    }
+
+    private void validatePeriod(Scheduling scheduling, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        long necessaryTime = scheduling.getDailyCapacity() * scheduling.getJobScheduling().size(); // daily capacity * quantity of days
+        long availableTime = ChronoUnit.HOURS.between(startDate, endDate);
+
+        if(necessaryTime > availableTime){
+            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + availableTime + " hours and it's necessary " + necessaryTime + " hours!");
         }
     }
 
-    private void validatePeriod(long necessaryHours, long avaialableHours) throws Exception {
-        if(necessaryHours > avaialableHours){
-            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + avaialableHours + " hours and it's necessary " + necessaryHours + " hours!");
-        }
-    }
-
-    private Scheduling runScheduling(List<Job> allJobsToSchedule, long avaialableHours) throws Exception {
+    private Scheduling runScheduling(List<Job> allJobsToSchedule, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         List<Job> jobsDay = new ArrayList<>();
         Scheduling scheduling = new Scheduling();
-        long necessaryHours = 0;
+        int necessaryTimeToday = 0;
+        LocalDateTime currentDate = startDate;
 
         while(!allJobsToSchedule.isEmpty()){
             Job job = findLowerFinishJob(allJobsToSchedule);
 
-            int duration = calculateJobsDuration(jobsDay, job);
-            if(scheduling.checkDailyCapacity(duration)){
+            necessaryTimeToday += job.getEstimatedDuration();
+
+            //job fits on current day
+            if(scheduling.checkDailyCapacity(necessaryTimeToday)){
+                currentDate = validateJob(job, currentDate, endDate);
                 jobsDay.add(job);
             } else {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
-                necessaryHours += scheduling.getDailyCapacity();
-                validatePeriod(necessaryHours, avaialableHours);
                 jobsDay.clear();
+
+                validatePeriod(scheduling, startDate, endDate);
+                currentDate = startDate.plusDays(scheduling.getJobScheduling().size());
+                currentDate = validateJob(job, currentDate, endDate);
+
+                necessaryTimeToday = job.getEstimatedDuration();
                 jobsDay.add(job);
             }
 
@@ -63,8 +77,7 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
-        necessaryHours += scheduling.getDailyCapacity();
-        validatePeriod(necessaryHours, avaialableHours);
+        validatePeriod(scheduling, startDate, endDate);
 
         scheduling.print();
         return scheduling;
@@ -91,19 +104,5 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         return lowerFinishJob;
-    }
-
-    /**
-     * Check if the job could be do at the current day or should be postponed to the next day
-     *
-     * @param job
-     * @return <b>True</b> if could be done at the current day or <b>False</b> if should be postponed
-     */
-    private int calculateJobsDuration(List<Job> jobs, Job job){
-        int duration = job.getEstimatedDuration();
-        for(Job previousJob : jobs){
-            duration += previousJob.getEstimatedDuration();
-        }
-        return duration;
     }
 }
