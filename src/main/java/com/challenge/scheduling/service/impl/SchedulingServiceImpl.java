@@ -19,6 +19,7 @@ public class SchedulingServiceImpl implements SchedulingService {
     @Override
     public Scheduling generateScheduling() {
         Scheduling scheduling = new Scheduling();
+
         List<Job> jobsDay = new ArrayList<>();
         List<Job> allJobsToSchedule = jobService.getAllJobs();
 
@@ -39,6 +40,7 @@ public class SchedulingServiceImpl implements SchedulingService {
 
         scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
 
+        scheduling.print();
         return scheduling;
     }
 

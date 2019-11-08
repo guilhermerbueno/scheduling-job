@@ -1,7 +1,9 @@
 package com.challenge.scheduling.service.impl;
 
 import com.challenge.scheduling.model.Job;
+import com.challenge.scheduling.repository.JobRepository;
 import com.challenge.scheduling.service.interfaces.JobService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,28 +11,42 @@ import java.util.List;
 @Service
 public class JobServiceImpl implements JobService {
 
+    @Autowired
+    private JobRepository jobRepository;
+
     @Override
     public List<Job> getAllJobs() {
-        return null;
+        return jobRepository.findAll();
     }
 
     @Override
-    public Job findJobById() {
-        return null;
+    public Job findJobById(long jobId) {
+        return jobRepository.getOne((int) jobId);
     }
 
     @Override
-    public Job createJob(Job job) {
-        return null;
+    public List<Job> createJobs(List<Job> jobs) {
+        return jobRepository.saveAll(jobs);
     }
 
     @Override
     public Job updateJob(long jobId, Job job) {
-        return null;
+        Job previousJob = jobRepository.getOne((int) jobId);
+        previousJob.setDescription(job.getDescription());
+        previousJob.setEstimatedDuration(job.getEstimatedDuration());
+        previousJob.setLimitDate(job.getLimitDate());
+
+        return jobRepository.save(previousJob);
     }
 
     @Override
     public Boolean deleteJob(long jobId) {
-        return null;
+        Job previousJob = jobRepository.getOne((int) jobId);
+        if(previousJob == null){
+            return false;
+        }
+
+        jobRepository.delete(previousJob);
+        return true;
     }
 }

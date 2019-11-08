@@ -7,9 +7,9 @@ import java.util.List;
 public interface JobService {
     List<Job> getAllJobs();
 
-    Job findJobById();
+    Job findJobById(long jobId);
 
-    Job createJob(Job job);
+    List<Job> createJobs(List<Job> jobs);
 
     Job updateJob(long jobId, Job job);
 

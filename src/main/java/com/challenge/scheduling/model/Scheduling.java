@@ -11,6 +11,7 @@ public class Scheduling {
 
     public Scheduling() {
         jobScheduling = new ArrayList<>();
+        this.getJobScheduling().clear();
     }
 
     public List<List<Job>> getJobScheduling() {
