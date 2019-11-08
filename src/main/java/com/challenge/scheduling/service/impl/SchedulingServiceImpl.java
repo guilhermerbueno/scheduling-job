@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,14 +18,16 @@ public class SchedulingServiceImpl implements SchedulingService {
     private JobService jobService;
 
     @Override
-    public Scheduling generateScheduling(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
-        List<Job> allJobsToSchedule = jobService.getAllJobs();
-
-        return runScheduling(allJobsToSchedule, startDate, endDate);
+    public Scheduling generateScheduling(List<Job> jobs, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        if(jobs == null || jobs.isEmpty()){
+            jobs = jobService.getAllJobs();
+        }
+        return runScheduling(jobs, startDate, endDate);
     }
 
     private LocalDateTime validateJob(Job job, LocalDateTime currentDate, LocalDateTime endDate) throws Exception {
         currentDate = currentDate.plusHours(job.getEstimatedDuration());
+
         if(job.getLimitDate().isBefore(currentDate)){
             throw new Exception("The job " + job.getId() + " is out of required period");
         }
@@ -35,15 +36,6 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         return currentDate;
-    }
-
-    private void validatePeriod(Scheduling scheduling, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
-        long necessaryTime = scheduling.getDailyCapacity() * scheduling.getJobScheduling().size(); // daily capacity * quantity of days
-        long availableTime = ChronoUnit.HOURS.between(startDate, endDate);
-
-        if(necessaryTime > availableTime){
-            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + availableTime + " hours and it's necessary " + necessaryTime + " hours!");
-        }
     }
 
     private Scheduling runScheduling(List<Job> allJobsToSchedule, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
@@ -65,7 +57,6 @@ public class SchedulingServiceImpl implements SchedulingService {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
                 jobsDay.clear();
 
-                validatePeriod(scheduling, startDate, endDate);
                 currentDate = startDate.plusDays(scheduling.getJobScheduling().size());
                 currentDate = validateJob(job, currentDate, endDate);
 
@@ -77,7 +68,6 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
-        validatePeriod(scheduling, startDate, endDate);
 
         scheduling.print();
         return scheduling;
