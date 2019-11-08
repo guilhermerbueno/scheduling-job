@@ -1,5 +1,12 @@
 package com.challenge.scheduling.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -18,6 +25,7 @@ public class Job {
 
     @NotNull
     @Column(name = "limit_date")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime limitDate;
 
     /**
@@ -26,6 +34,9 @@ public class Job {
     @NotNull
     @Column(name = "duration")
     private int estimatedDuration;
+
+    public Job() {
+    }
 
     public Job(long id, String description, LocalDateTime limitDate, int estimatedDuration) {
         this.id = id;
