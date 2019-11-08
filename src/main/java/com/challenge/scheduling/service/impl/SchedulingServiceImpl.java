@@ -7,6 +7,7 @@ import com.challenge.scheduling.service.interfaces.SchedulingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,10 @@ public class SchedulingServiceImpl implements SchedulingService {
     }
 
     private LocalDateTime validateJob(Job job, LocalDateTime currentDate, LocalDateTime endDate) throws Exception {
-        currentDate = currentDate.plusHours(job.getEstimatedDuration());
+        currentDate = currentDate.plus(Duration.ofHours(job.getEstimatedDuration()));
 
         if(job.getLimitDate().isBefore(currentDate)){
-            throw new Exception("The job " + job.getId() + " is out of required period");
+            throw new Exception("The job " + job.getId() + " is out of required period. The limit is " + job.getLimitDate() + " and the current date is " + currentDate);
         }
         if(currentDate.isAfter(endDate)){
             throw new Exception("The job "+ job.getId() + " couldn't be finish before the limit date");
@@ -57,7 +58,7 @@ public class SchedulingServiceImpl implements SchedulingService {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
                 jobsDay.clear();
 
-                currentDate = startDate.plusDays(scheduling.getJobScheduling().size());
+                currentDate = startDate.plusDays(scheduling.getJobScheduling().size()).withHour(0).withMinute(0).withSecond(1);
                 currentDate = validateJob(job, currentDate, endDate);
 
                 necessaryTimeToday = job.getEstimatedDuration();
