@@ -20,12 +20,23 @@ public class SchedulingController {
     @Autowired
     private SchedulingService schedulingService;
 
+    @GetMapping("/full")
+    public ResponseEntity generateFullScheduling(@RequestParam(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                             @RequestParam(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+                                             @Valid @RequestBody(required = false) List<Job> jobs) throws Exception {
+        try {
+            return ResponseEntity.ok(schedulingService.generateScheduling(jobs, startDate, endDate));
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
     @GetMapping
     public ResponseEntity generateScheduling(@RequestParam(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
                                              @RequestParam(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                              @Valid @RequestBody(required = false) List<Job> jobs) throws Exception {
         try {
-            return ResponseEntity.ok(schedulingService.generateScheduling(jobs, startDate, endDate));
+            return ResponseEntity.ok(schedulingService.generateScheduling(jobs, startDate, endDate).getJobIds());
         }catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

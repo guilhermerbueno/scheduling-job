@@ -40,13 +40,22 @@ public class Scheduling {
         return jobsDuration <= getDailyCapacity();
     }
 
-    public void print(){
+    public List<List<Integer>> getJobIds(){
+        List<List<Integer>> jobIds = new ArrayList<>();
+        jobIds.clear();
+
         for(List<Job> dailyJobs : getJobScheduling()){
-            List<Integer> jobIds = new ArrayList<Integer>();
+            List<Integer> dailyJobIds = new ArrayList<>();
             for(Job job : dailyJobs){
-                jobIds.add(job.getId());
+                dailyJobIds.add(job.getId());
             }
-            System.out.println(jobIds);
+            jobIds.add(dailyJobIds);
         }
+
+        return jobIds;
+    }
+
+    public void print(){
+        System.out.println(getJobIds());
     }
 }
