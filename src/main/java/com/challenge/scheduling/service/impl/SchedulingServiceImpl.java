@@ -18,10 +18,13 @@ public class SchedulingServiceImpl implements SchedulingService {
 
     @Override
     public Scheduling generateScheduling() {
-        Scheduling scheduling = new Scheduling();
-
-        List<Job> jobsDay = new ArrayList<>();
         List<Job> allJobsToSchedule = jobService.getAllJobs();
+        return runScheduling(allJobsToSchedule);
+    }
+
+    private Scheduling runScheduling(List<Job> allJobsToSchedule){
+        List<Job> jobsDay = new ArrayList<>();
+        Scheduling scheduling = new Scheduling();
 
         while(!allJobsToSchedule.isEmpty()){
             Job job = findLowerFinishJob(allJobsToSchedule);
