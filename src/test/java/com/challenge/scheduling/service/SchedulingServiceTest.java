@@ -81,6 +81,19 @@ public class SchedulingServiceTest {
         assertEquals(2, scheduling.getJobScheduling().size());
     }
 
+    @Test(expected = Exception.class)
+    public void givenJobsAndPeriod_whenTheJobEstimatedDurationIsGreaterThanAllowed_thenFail() throws Exception {
+        List<Job> jobs = createJobs();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        jobs.add(new Job(4,"Importação de arquivos de fundos", LocalDateTime.parse("2019-11-10 12:00:00", formatter), 10));
+        LocalDateTime startDate = LocalDateTime.parse("2019-11-10 08:00:00", formatter);
+        LocalDateTime endDate = LocalDateTime.parse("2019-11-11 18:00:00", formatter);
+
+        Scheduling scheduling = schedulingService.generateScheduling(jobs, startDate, endDate);
+
+        assertEquals(2, scheduling.getJobScheduling().size());
+    }
+
     private List<Job> createJobs(){
         List<Job> jobs = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
