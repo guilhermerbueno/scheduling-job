@@ -21,9 +21,9 @@ public class SchedulingServiceImpl implements SchedulingService {
     @Override
     public Scheduling generateScheduling(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         List<Job> allJobsToSchedule = jobService.getAllJobs();
-        long avaialableDays = ChronoUnit.DAYS.between(startDate, endDate);
+        long avaialableHours = ChronoUnit.HOURS.between(startDate, endDate);
         validateJobs(allJobsToSchedule, startDate, endDate);
-        return runScheduling(allJobsToSchedule, avaialableDays);
+        return runScheduling(allJobsToSchedule, avaialableHours);
     }
 
     private void validateJobs(List<Job> jobs, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
@@ -34,16 +34,16 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
     }
 
-    private void validatePeriod(long necessaryDays, long availableDays) throws Exception {
-        if(necessaryDays > availableDays){
-            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + availableDays + " days and it's necessary " + necessaryDays + "days!");
+    private void validatePeriod(long necessaryHours, long avaialableHours) throws Exception {
+        if(necessaryHours > avaialableHours){
+            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + avaialableHours + " hours and it's necessary " + necessaryHours + " hours!");
         }
     }
 
-    private Scheduling runScheduling(List<Job> allJobsToSchedule, long availableDays) throws Exception {
+    private Scheduling runScheduling(List<Job> allJobsToSchedule, long avaialableHours) throws Exception {
         List<Job> jobsDay = new ArrayList<>();
         Scheduling scheduling = new Scheduling();
-        long necessaryDays = 0;
+        long necessaryHours = 0;
 
         while(!allJobsToSchedule.isEmpty()){
             Job job = findLowerFinishJob(allJobsToSchedule);
@@ -53,8 +53,8 @@ public class SchedulingServiceImpl implements SchedulingService {
                 jobsDay.add(job);
             } else {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
-                necessaryDays += 1;
-                validatePeriod(necessaryDays, availableDays);
+                necessaryHours += scheduling.getDailyCapacity();
+                validatePeriod(necessaryHours, avaialableHours);
                 jobsDay.clear();
                 jobsDay.add(job);
             }
@@ -63,8 +63,8 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
-        necessaryDays += 1;
-        validatePeriod(necessaryDays, availableDays);
+        necessaryHours += scheduling.getDailyCapacity();
+        validatePeriod(necessaryHours, avaialableHours);
 
         scheduling.print();
         return scheduling;
