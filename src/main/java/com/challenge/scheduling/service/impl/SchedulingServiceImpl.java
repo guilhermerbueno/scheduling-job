@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class SchedulingServiceImpl implements SchedulingService {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
                 jobsDay.clear();
 
-                currentDate = startDate.plusDays(scheduling.getJobScheduling().size()).withHour(0).withMinute(0).withSecond(1);
+                currentDate = startDate.plusDays(scheduling.getJobScheduling().size()).with(LocalTime.MIDNIGHT);
                 currentDate = validateJob(job, currentDate, endDate);
 
                 necessaryTimeToday = job.getEstimatedDuration();
