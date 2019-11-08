@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,22 +21,29 @@ public class SchedulingServiceImpl implements SchedulingService {
     @Override
     public Scheduling generateScheduling(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         List<Job> allJobsToSchedule = jobService.getAllJobs();
-        int daysAvailable = endDate.compareTo(startDate);
+        long avaialableDays = ChronoUnit.DAYS.between(startDate, endDate);
         validateJobs(allJobsToSchedule, startDate, endDate);
-        return runScheduling(allJobsToSchedule);
+        return runScheduling(allJobsToSchedule, avaialableDays);
     }
 
     private void validateJobs(List<Job> jobs, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         for(Job job : jobs){
             if(job.getLimitDate().isBefore(startDate)){
-                throw new Exception();
+                throw new Exception("Job " + job.getId() + " is out of required period");
             }
         }
     }
 
-    private Scheduling runScheduling(List<Job> allJobsToSchedule){
+    private void validatePeriod(long necessaryDays, long availableDays) throws Exception {
+        if(necessaryDays > availableDays){
+            throw new Exception("It's not possible to schedule the jobs in the required period! The period has " + availableDays + " days and it's necessary " + necessaryDays + "days!");
+        }
+    }
+
+    private Scheduling runScheduling(List<Job> allJobsToSchedule, long availableDays) throws Exception {
         List<Job> jobsDay = new ArrayList<>();
         Scheduling scheduling = new Scheduling();
+        long necessaryDays = 0;
 
         while(!allJobsToSchedule.isEmpty()){
             Job job = findLowerFinishJob(allJobsToSchedule);
@@ -45,6 +53,8 @@ public class SchedulingServiceImpl implements SchedulingService {
                 jobsDay.add(job);
             } else {
                 scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
+                necessaryDays += 1;
+                validatePeriod(necessaryDays, availableDays);
                 jobsDay.clear();
                 jobsDay.add(job);
             }
@@ -53,6 +63,8 @@ public class SchedulingServiceImpl implements SchedulingService {
         }
 
         scheduling.getJobScheduling().add(new ArrayList<>(jobsDay));
+        necessaryDays += 1;
+        validatePeriod(necessaryDays, availableDays);
 
         scheduling.print();
         return scheduling;
