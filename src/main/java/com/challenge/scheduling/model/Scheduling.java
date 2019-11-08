@@ -42,7 +42,7 @@ public class Scheduling {
 
     public void print(){
         for(List<Job> dailyJobs : getJobScheduling()){
-            List<Long> jobIds = new ArrayList<Long>();
+            List<Integer> jobIds = new ArrayList<Integer>();
             for(Job job : dailyJobs){
                 jobIds.add(job.getId());
             }

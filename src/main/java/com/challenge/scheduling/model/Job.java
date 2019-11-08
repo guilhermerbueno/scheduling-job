@@ -17,7 +17,7 @@ public class Job {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private int id;
 
     @NotNull
     @Column(name = "description")
@@ -38,18 +38,18 @@ public class Job {
     public Job() {
     }
 
-    public Job(long id, String description, LocalDateTime limitDate, int estimatedDuration) {
+    public Job(int id, String description, LocalDateTime limitDate, int estimatedDuration) {
         this.id = id;
         this.description = description;
         this.limitDate = limitDate;
         this.estimatedDuration = estimatedDuration;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

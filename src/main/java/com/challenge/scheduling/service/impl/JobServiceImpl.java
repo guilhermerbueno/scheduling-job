@@ -20,7 +20,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job findJobById(long jobId) {
+    public Job findJobById(int jobId) {
         return jobRepository.getOne((int) jobId);
     }
 
@@ -30,8 +30,8 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job updateJob(long jobId, Job job) {
-        Job previousJob = jobRepository.getOne((int) jobId);
+    public Job updateJob(int jobId, Job job) {
+        Job previousJob = jobRepository.getOne(jobId);
         previousJob.setDescription(job.getDescription());
         previousJob.setEstimatedDuration(job.getEstimatedDuration());
         previousJob.setLimitDate(job.getLimitDate());
@@ -40,7 +40,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Boolean deleteJob(long jobId) {
+    public Boolean deleteJob(int jobId) {
         Job previousJob = jobRepository.getOne((int) jobId);
         if(previousJob == null){
             return false;

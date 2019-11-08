@@ -22,7 +22,7 @@ public class JobController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Job> findJobById(@PathVariable("id") long jobId){
+    public ResponseEntity<Job> findJobById(@PathVariable("id") int jobId){
         return ResponseEntity.ok(jobService.findJobById(jobId));
     }
 
@@ -33,12 +33,12 @@ public class JobController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Job> updateJob(@PathVariable("id") long jobId, @Valid @RequestBody Job job){
+    public ResponseEntity<Job> updateJob(@PathVariable("id") int jobId, @Valid @RequestBody Job job){
         return ResponseEntity.ok(jobService.updateJob(jobId, job));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Job> deleteJob(@PathVariable("id") long jobId){
+    public ResponseEntity<Job> deleteJob(@PathVariable("id") int jobId){
         jobService.deleteJob(jobId);
         return ResponseEntity.ok().build();
     }

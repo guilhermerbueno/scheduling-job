@@ -7,11 +7,11 @@ import java.util.List;
 public interface JobService {
     List<Job> getAllJobs();
 
-    Job findJobById(long jobId);
+    Job findJobById(int jobId);
 
     List<Job> createJobs(List<Job> jobs);
 
-    Job updateJob(long jobId, Job job);
+    Job updateJob(int jobId, Job job);
 
-    Boolean deleteJob(long jobId);
+    Boolean deleteJob(int jobId);
 }
