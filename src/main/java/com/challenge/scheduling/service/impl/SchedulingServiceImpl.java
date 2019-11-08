@@ -7,6 +7,7 @@ import com.challenge.scheduling.service.interfaces.SchedulingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,19 @@ public class SchedulingServiceImpl implements SchedulingService {
     private JobService jobService;
 
     @Override
-    public Scheduling generateScheduling() {
+    public Scheduling generateScheduling(LocalDateTime startDate, LocalDateTime endDate) throws Exception {
         List<Job> allJobsToSchedule = jobService.getAllJobs();
+        int daysAvailable = endDate.compareTo(startDate);
+        validateJobs(allJobsToSchedule, startDate, endDate);
         return runScheduling(allJobsToSchedule);
+    }
+
+    private void validateJobs(List<Job> jobs, LocalDateTime startDate, LocalDateTime endDate) throws Exception {
+        for(Job job : jobs){
+            if(job.getLimitDate().isBefore(startDate)){
+                throw new Exception();
+            }
+        }
     }
 
     private Scheduling runScheduling(List<Job> allJobsToSchedule){
